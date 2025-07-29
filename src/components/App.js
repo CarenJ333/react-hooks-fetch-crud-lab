@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
-import QuestionList from "./QuestionList";
+import React, { useState, useEffect } from "react";
+import AdminNavBar from "./AdminNavBar";
 import QuestionForm from "./QuestionForm";
+import QuestionList from "./QuestionList";
 
 function App() {
   const [page, setPage] = useState("List");
@@ -8,8 +9,8 @@ function App() {
 
   useEffect(() => {
     fetch("http://localhost:4000/questions")
-      .then((r) => r.json())
-      .then(setQuestions);
+      .then((res) => res.json())
+      .then((data) => setQuestions(data));
   }, []);
 
   function handleAddQuestion(newQuestion) {
@@ -17,43 +18,29 @@ function App() {
   }
 
   function handleDeleteQuestion(deletedId) {
-    const updated = questions.filter((q) => q.id !== deletedId);
-    setQuestions(updated);
+    setQuestions(questions.filter((q) => q.id !== deletedId));
   }
 
   function handleUpdateQuestion(updatedQuestion) {
-    const updated = questions.map((q) =>
+    const updatedList = questions.map((q) =>
       q.id === updatedQuestion.id ? updatedQuestion : q
     );
-    setQuestions(updated);
+    setQuestions(updatedList);
   }
 
-  function handleUpdateCorrectAnswer(updatedQuestion) {
-  const updatedQuestions = questions.map((q) =>
-    q.id === updatedQuestion.id ? updatedQuestion : q
-  );
-  setQuestions(updatedQuestions);
-}
-
-
   return (
-    <section>
-      <h1>Quiz Questions</h1>
-      <nav>
-        <button onClick={() => setPage("List")}>View Questions</button>
-        <button onClick={() => setPage("Form")}>New Question</button>
-      </nav>
+    <main>
+      <AdminNavBar onChangePage={setPage} />
       {page === "Form" ? (
         <QuestionForm onAddQuestion={handleAddQuestion} />
       ) : (
         <QuestionList
           questions={questions}
-          onDelete={handleDeleteQuestion}
-          onUpdate={handleUpdateQuestion}
-          onUpdateCorrectAnswer={handleUpdateCorrectAnswer}
+          onDeleteQuestion={handleDeleteQuestion}
+          onUpdateQuestion={handleUpdateQuestion}
         />
       )}
-    </section>
+    </main>
   );
 }
 
